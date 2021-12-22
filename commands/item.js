@@ -1,6 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageAttachment, MessageEmbed, MessageActionRow, MessageButton, MessageSelectMenu } = require('discord.js');
 const fs = require('fs');
+const { bold, italic, strikethrough, underscore, spoiler, quote, blockQuote } = require('@discordjs/builders');
+
 var stringSimilarity = require("string-similarity");
 let rawdata = fs.readFileSync('./data/ggz_data.json');
 const ggz_data = JSON.parse(rawdata);
@@ -46,7 +48,11 @@ module.exports = {
                             .setLabel('XXX')
                             .setStyle('PRIMARY'),
                     );
-                interaction.editReply({ embeds: [this.getEmbed(item[0], 'info')], components: [customRow], files: [setIcon] });
+                interaction.editReply({
+                    embeds: [this.getEmbed(item[0], 'info')],
+                    components: [],
+                    files: [setIcon]
+                });
             }
             if (item.length > 1) {
                 item.forEach(item => {
@@ -96,7 +102,7 @@ module.exports = {
                         const setIcon = new MessageAttachment('./assets/icons/' + item.find(item => item.id == i.values[0]).seriesId + '.png');
                         await i.update({
                             embeds: [this.getEmbed(item.find(item => item.id == i.values[0]), 'info')],
-                            components: [customRow],
+                            components: [],
                             files: [setIcon]
                         });
                     }
@@ -111,22 +117,21 @@ module.exports = {
             case 'info':
                 const stringImg = getIdString(data.img);
                 let embed = new MessageEmbed()
-                    .setThumbnail("http://static.image.mihoyo.com/hsod2_webview/images/broadcast_top/equip_icon/png/" + stringImg + ".png")
+                    .setThumbnail('attachment://' + data.seriesId + '.png')
                     .setColor('#0099ff')
                     .setTitle(getTitle(data.rarity))
                     .setAuthor(data.title, 'attachment://' + data.seriesId + '.png')
                     .setDescription(getDescription(data.desc))
                     // .setImage('attachment://' + name + '.png')
-                    .setTimestamp();
+                    .setTimestamp()
+                embed.addField("Stats", blockQuote(italic(bold(getStats(data)))));
+                embed.setThumbnail("http://static.image.mihoyo.com/hsod2_webview/images/broadcast_top/equip_icon/png/" + stringImg + ".png")
                 if (data.prop1) {
                     embed.addField(data.prop1.title + "-" + data.prop1.damageType, getDescription(data.prop1.maxLvDesc), true)
                 }
                 if (data.prop2) {
                     embed.addField(data.prop2.title + "-" + data.prop2.damageType, getDescription(data.prop2.maxLvDesc), true)
                 }
-
-
-
                 return embed;
             // .setFooter('Info', 'attachment://main.png');
             // case 'skill':
@@ -171,6 +176,110 @@ module.exports = {
         }
     }
 };
+
+function getStats(data) {
+    let stats = "";
+    if (data.baseType) {
+        stats = stats + "Type: " + getType(data.baseType) + "\n";
+    }
+    if (data.maxlv) {
+        stats = stats + "Max lv: " + data.maxlv + "\n";
+    }
+    if (data.cost) {
+        stats = stats + "Cost: " + data.cost + "\n";
+    }
+    if (data.hpMaxLv && data.hpMaxLv != 0) {
+        stats = stats + "HP: " + data.hpMaxLv + "\n";
+    }
+    if (data.damageType) {
+        stats = stats + "Dmg Type: " + getDamageTypeEmoji(data.damageType) + "\n";
+    }
+    if (data.damageMaxLv) {
+        stats = stats + "Dmg: " + data.damageMaxLv + "\n";
+    }
+    if (data.ammoMaxLv) {
+        stats = stats + "Ammo: " + data.ammoMaxLv + "\n";
+    }
+    if (data.fireRateMaxLv) {
+        stats = stats + "Att Spd: " + data.fireRateMaxLv + "\n";
+    }
+    if (data.limitedNumber && data.limitedNumber != 0) {
+        stats = stats + "Limit: " + data.limitedNumber + "\n";
+    }
+
+
+
+
+    return stats;
+}
+
+function getType(baseType) {
+    switch (baseType) {
+        case "近战-刀剑":
+            return "Melee-Sword"
+        case "自动步枪":
+            return "Auto rifle"
+        case "狙击枪":
+            return "Sniper rifle"
+        case "投掷":
+            return "Throwing"
+        case "放置-地雷":
+            return "Deploy-Mine"
+        case "单兵火箭":
+            return "Launcher"
+        case "喷雾":
+            return "Spray"
+        case "霰弹-独头":
+            return "Shotgun-single"
+        case "手枪-手炮":
+            return "Pistol-Hand Cannon"
+        case "近战-电锯":
+            return "Melee-Chainsaw"
+        case "放置-炮台":
+            return "Deploy-Turret"
+        case "放置-诱导":
+            return "Deploy"
+        case "特殊":
+            return "Special"
+        case "放置-远古兵器":
+            return "Deploy-Ancient"
+        case "放置-人形":
+            return "Deploy-Dolly"
+        case "放置-特殊":
+            return "Deploy-Special"
+        case "喷雾-激活":
+            return "Spray-Activated"
+        case "喷雾-附魔":
+            return "Spray-Enchanting"
+        case "特殊-弓":
+            return "Special-Bow"
+        case "喷雾-切换":
+            return "Spray-toggle"
+        default:
+            return "XXX";
+    }
+}
+
+function getDamageTypeEmoji(damageType) {
+    switch (damageType) {
+        case "fire":
+            return "<:fire:923056987929997345>";
+        case "snow":
+            return "<:snow:923056988122914816>";
+        case "physic":
+            return "<:physic:923056988043218954>";
+        case "poison":
+            return "<:poison:923056988290682920>";
+        case "none":
+            return "<:none:923056987342770206>";
+        case "light":
+            return "<:light:923056987846107177>";
+        case "power":
+            return "<:power:923056988043235370>";
+        default:
+            return "<:none:923056987342770206>";
+    }
+}
 
 function getIdString(imgNumber) {
     switch (imgNumber.split("").length) {
