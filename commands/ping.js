@@ -6,6 +6,6 @@ module.exports = {
         .setName('ping')
         .setDescription('Check if bot is dying!!'),
     async execute(interaction) {
-        await interaction.reply(bold('Im alive!'));
+        await interaction.reply(bold('Hi !!'));
     },
 };
