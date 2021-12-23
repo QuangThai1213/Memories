@@ -7,7 +7,7 @@ const ggz_data = JSON.parse(rawdata);
 ggz_data.forEach(equip => {
     if (equip.posterId && equip.posterId != 0) {
         const path = "./moe/" + equip.posterId + ".png";
-        fs.access(path, fs.F_OK, async (err) => {
+        fs.access(path, fs.F_OK, async(err) => {
             if (err) {
                 try {
                     await getImg(equip.posterId);
@@ -19,8 +19,7 @@ ggz_data.forEach(equip => {
                     if (getFileSize(path) == 0) {
                         fs.unlinkSync(path)
                     }
-                } catch (error) {
-                }
+                } catch (error) {}
             }
         })
     }
@@ -28,13 +27,13 @@ ggz_data.forEach(equip => {
 
 async function getImg(imgId) {
     let moeId = 1000 + Number(imgId)
-    if (imgId = "31") {
+    if (imgId == "31") {
         moeId = "10311";
     }
-    if (imgId = "20") {
+    if (imgId == "20") {
         moeId = "10201";
     }
-    if (imgId = "155") {
+    if (imgId == "155") {
         moeId = "11551";
     }
     const config = {
