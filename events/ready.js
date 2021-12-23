@@ -5,7 +5,7 @@ module.exports = {
         console.log(`Ready! Logged in as ${client.user.tag}`);
         client.user.setPresence({
             activities: [{
-                name: 'Revived Witch',
+                name: 'Gun Girl Z',
                 type: 'STREAMING',
                 // url: 'Revived Witch'
             }]
