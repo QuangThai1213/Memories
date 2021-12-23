@@ -30,7 +30,6 @@ module.exports = {
                 interaction.editReply("Find Nothing !");
             }
             if (item.length === 1) {
-                const setIcon = new MessageAttachment('./assets/icons/' + item[0].seriesId + '.png');
                 const customRow = new MessageActionRow()
                     .addComponents(
                         new MessageButton()
@@ -48,10 +47,12 @@ module.exports = {
                             .setLabel('XXX')
                             .setStyle('PRIMARY'),
                     );
+                const setIcon = new MessageAttachment('./assets/icons/' + item[0].seriesId + '.png');
+                const equipIcon = new MessageAttachment('./assets/equip_icons/' + getIdString(item[0].img) + '.png');
                 interaction.editReply({
                     embeds: [this.getEmbed(item[0], 'info')],
                     components: [],
-                    files: [setIcon]
+                    files: [setIcon, equipIcon]
                 });
             }
             if (item.length > 1) {
@@ -100,11 +101,12 @@ module.exports = {
                                     .setStyle('PRIMARY'),
                             );
                         const setIcon = new MessageAttachment('./assets/icons/' + item.find(item => item.id == i.values[0]).seriesId + '.png');
+                        const equipIcon = new MessageAttachment('./assets/equip_icons/' + getIdString(item.find(item => item.id == i.values[0]).img) + '.png');
                         await i.update({
                             content: null,
                             embeds: [this.getEmbed(item.find(item => item.id == i.values[0]), 'info')],
                             components: [],
-                            files: [setIcon]
+                            files: [setIcon, equipIcon]
                         });
                     }
                 })
@@ -125,7 +127,7 @@ module.exports = {
                     // .setImage('attachment://' + name + '.png')
                     .setTimestamp()
                 embed.addField("Stats", blockQuote(italic(bold(getStats(data)))));
-                embed.setThumbnail("http://static.image.mihoyo.com/hsod2_webview/images/broadcast_top/equip_icon/png/" + stringImg + ".png");
+                embed.setThumbnail('attachment://' + stringImg + '.png');
                 if (data.prop1) {
                     embed.addField(data.prop1.title + "-" + data.prop1.damageType, getDescription(data.prop1.maxLvDesc), true)
                 }
