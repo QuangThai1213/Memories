@@ -23,7 +23,7 @@ module.exports = {
             const disableRow = new MessageActionRow()
                 .addComponents(
                     new MessageButton()
-                        .setCustomId('F')
+                        .setCustomId('FF')
                         .setLabel('Press F')
                         .setStyle('DANGER')
                         .setDisabled(true));

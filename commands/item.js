@@ -9,7 +9,7 @@ const ggz_data = JSON.parse(rawdata);
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('item')
-        .setDescription('Get dolly information !!!')
+        .setDescription('Get equip information !!!')
         .addNumberOption(option =>
             option.setName('id')
                 .setDescription('id'))
@@ -22,7 +22,7 @@ module.exports = {
         const userId = interaction.user.id
         await interaction.deferReply();
         if (findData(idInput, nameInput) == "Nothing") {
-            interaction.editReply("?????");
+            interaction.editReply("XXX");
         } else {
             const item = findData(idInput, nameInput);
             const lstItemName = []
@@ -101,6 +101,7 @@ module.exports = {
                             );
                         const setIcon = new MessageAttachment('./assets/icons/' + item.find(item => item.id == i.values[0]).seriesId + '.png');
                         await i.update({
+                            content: null,
                             embeds: [this.getEmbed(item.find(item => item.id == i.values[0]), 'info')],
                             components: [],
                             files: [setIcon]
@@ -119,18 +120,28 @@ module.exports = {
                 let embed = new MessageEmbed()
                     .setThumbnail('attachment://' + data.seriesId + '.png')
                     .setColor('#0099ff')
-                    .setTitle(getTitle(data.rarity))
                     .setAuthor(data.title, 'attachment://' + data.seriesId + '.png')
-                    .setDescription(getDescription(data.desc))
+                    .setDescription(getTitle(data.rarity) + "\n" + getDescription(data.desc) + "\u200B")
                     // .setImage('attachment://' + name + '.png')
                     .setTimestamp()
                 embed.addField("Stats", blockQuote(italic(bold(getStats(data)))));
-                embed.setThumbnail("http://static.image.mihoyo.com/hsod2_webview/images/broadcast_top/equip_icon/png/" + stringImg + ".png")
+                embed.setThumbnail("http://static.image.mihoyo.com/hsod2_webview/images/broadcast_top/equip_icon/png/" + stringImg + ".png");
                 if (data.prop1) {
                     embed.addField(data.prop1.title + "-" + data.prop1.damageType, getDescription(data.prop1.maxLvDesc), true)
                 }
                 if (data.prop2) {
                     embed.addField(data.prop2.title + "-" + data.prop2.damageType, getDescription(data.prop2.maxLvDesc), true)
+                }
+                if (data.ultraSkill) {
+                    embed.addField(
+                        data.hiddenUltraSkill ? data.hiddenUltraSkill.title : data.ultraSkill.title,
+                        getDescription(data.hiddenUltraSkill ? data.hiddenUltraSkill.maxLvDesc : data.ultraSkill.maxLvDesc), true)
+                }
+                if (data.normalSkill1) {
+                    embed.addField(data.normalSkill1.title, getDescription(data.normalSkill1.maxLvDesc), true)
+                }
+                if (data.normalSkill2) {
+                    embed.addField(data.normalSkill2.title, getDescription(data.normalSkill2.maxLvDesc), true)
                 }
                 return embed;
             // .setFooter('Info', 'attachment://main.png');
@@ -201,15 +212,15 @@ function getStats(data) {
         stats = stats + "Ammo: " + data.ammoMaxLv + "\n";
     }
     if (data.fireRateMaxLv) {
-        stats = stats + "Att Spd: " + data.fireRateMaxLv + "\n";
+        stats = stats + "Att Spd: " + data.fireRateMaxLv + "/s" + "\n";
     }
     if (data.limitedNumber && data.limitedNumber != 0) {
         stats = stats + "Limit: " + data.limitedNumber + "\n";
     }
-
-
-
-
+    if (data.atkMaxLv) {
+        stats = stats + "Atk: " + data.atkMaxLv + "\n";
+        stats = stats + "Crit rate: " + data.critRate * 100 + "%" + "\n";
+    }
     return stats;
 }
 
@@ -277,7 +288,7 @@ function getDamageTypeEmoji(damageType) {
         case "power":
             return "<:power:923056988043235370>";
         default:
-            return "<:none:923056987342770206>";
+            return damageType;
     }
 }
 
@@ -301,7 +312,7 @@ function getDescription(desc) {
 function getTitle(rarity) {
     let rarityString = "";
     for (let index = 0; index < rarity; index++) {
-        rarityString = rarityString + "<:rarity:922903644263809095>";
+        rarityString = rarityString + "⭐";
     }
     return rarityString;
 }
@@ -313,15 +324,24 @@ function findData(id, name) {
     }
     if (id != null) {
         if (ggz_data.find(item => item.id == id)) {
-            lstData.push(ggz_data.find(item => item.id == id))
+            if (ggz_data.find(item => item.id == id).ultraSkill) {
+                lstData.push({ ...ggz_data.find(item => item.id == id), seriesId: 22 })
+            } else {
+                lstData.push(ggz_data.find(item => item.id == id))
+            }
+
         }
         return lstData;
     }
     if (name != null && id == null) {
         ggz_data.filter(
-            item => stringSimilarity.compareTwoStrings(name, item.title) >= 0.5
-                || item.title.includes(name)).forEach(item => {
-                    lstData.push(item);
+            item => stringSimilarity.compareTwoStrings(name.replaceAll(" ", "").toLowerCase(), item.title.replaceAll(" ", "").toLowerCase()) >= 0.5
+                || item.title.replaceAll(" ", "").toLowerCase().includes(name.replaceAll(" ", "").toLowerCase())).forEach(item => {
+                    if (item.ultraSkill) {
+                        lstData.push({ ...item, seriesId: 22 });
+                    } else {
+                        lstData.push(item);
+                    }
                 });
         return lstData;
     }
