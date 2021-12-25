@@ -49,10 +49,14 @@ module.exports = {
                     );
                 const setIcon = new MessageAttachment('./assets/icons/' + item[0].seriesId + '.png');
                 const equipIcon = new MessageAttachment('./assets/equip_icons/' + getIdString(item[0].img) + '.png');
+                let moe = "-1";
+                if (item[0].posterId && item[0].posterId != "0") {
+                    moe = new MessageAttachment('./assets/moe/' + getIdString(item[0].posterId) + '.png');
+                }
                 interaction.editReply({
-                    embeds: [this.getEmbed(item[0], 'info')],
+                    embeds: [this.getEmbed(item[0], 'info', moe)],
                     components: [],
-                    files: [setIcon, equipIcon]
+                    files: moe == "-1" ? [setIcon, equipIcon] : [setIcon, equipIcon, moe]
                 });
             }
             if (item.length > 1) {
@@ -86,27 +90,32 @@ module.exports = {
                         const customRow = new MessageActionRow()
                             .addComponents(
                                 new MessageButton()
-                                    .setCustomId('info-' + i.values[0])
+                                    .setCustomId('info-' + i.values[0].id)
                                     .setLabel('Info')
                                     .setStyle('PRIMARY'),
                             ).addComponents(
                                 new MessageButton()
-                                    .setCustomId('XXX-' + i.values[0])
+                                    .setCustomId('XXX-' + i.values[0].id)
                                     .setLabel('XXX')
                                     .setStyle('PRIMARY'),
                             ).addComponents(
                                 new MessageButton()
-                                    .setCustomId('moe-' + i.values[0])
+                                    .setCustomId('moe-' + i.values[0].id)
                                     .setLabel('XXX')
                                     .setStyle('PRIMARY'),
                             );
                         const setIcon = new MessageAttachment('./assets/icons/' + item.find(item => item.id == i.values[0]).seriesId + '.png');
                         const equipIcon = new MessageAttachment('./assets/equip_icons/' + getIdString(item.find(item => item.id == i.values[0]).img) + '.png');
+                        let moe = "-1";
+                        if (item.find(item => item.id == i.values[0]).posterId && item.find(item => item.id == i.values[0]).posterId != "0") {
+                            moe = new MessageAttachment('./assets/moe/' + item.find(item => item.id == i.values[0]).posterId + '.png');
+                        }
+
                         await i.update({
                             content: null,
-                            embeds: [this.getEmbed(item.find(item => item.id == i.values[0]), 'info')],
+                            embeds: [this.getEmbed(item.find(item => item.id == i.values[0]), 'info', moe)],
                             components: [],
-                            files: [setIcon, equipIcon]
+                            files: moe == "-1" ? [setIcon, equipIcon] : [setIcon, equipIcon, moe]
                         });
                     }
                 })
@@ -114,7 +123,7 @@ module.exports = {
             }
         };
     },
-    getEmbed(data, category) {
+    getEmbed(data, category, moe) {
         switch (category) {
             default:
             case 'info':
@@ -124,12 +133,12 @@ module.exports = {
                     .setColor('#0099ff')
                     .setAuthor(data.title, 'attachment://' + data.seriesId + '.png')
                     .setDescription(getTitle(data.rarity) + "\n" + getDescription(data.desc) + "\u200B")
-                    // .setImage('attachment://' + name + '.png')
+
                     .setTimestamp()
                 embed.addField("Stats", blockQuote(italic(bold(getStats(data)))));
                 embed.setThumbnail('attachment://' + stringImg + '.png');
                 if (data.prop1) {
-                    embed.addField(data.prop1.title + "-" + data.prop1.damageType, getDescription(data.prop1.maxLvDesc), true)
+                    embed.addField(getTitleDescription(data.prop1), getDescription(data.prop1.maxLvDesc), true)
                 }
                 if (data.prop2) {
                     embed.addField(data.prop2.title + "-" + data.prop2.damageType, getDescription(data.prop2.maxLvDesc), true)
@@ -144,6 +153,9 @@ module.exports = {
                 }
                 if (data.normalSkill2) {
                     embed.addField(data.normalSkill2.title, getDescription(data.normalSkill2.maxLvDesc), true)
+                }
+                if (moe != "-1") {
+                    embed.setImage('attachment://' + data.posterId + '.png')
                 }
                 return embed;
             // .setFooter('Info', 'attachment://main.png');
@@ -309,6 +321,14 @@ function getIdString(imgNumber) {
 
 function getDescription(desc) {
     return desc.replaceAll("#n", "").replaceAll("#!ALB(37)", "");
+}
+
+function getTitleDescription(skill) {
+    let title = skill.title
+    if (skill.damageType && skill.damageType != "none") {
+        title = title + " - " + getDamageTypeEmoji(skill.damageType);
+    }
+    return title;
 }
 
 function getTitle(rarity) {
