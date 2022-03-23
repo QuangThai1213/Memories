@@ -18,12 +18,14 @@ module.exports = {
         .setName('apococolle')
         .setDescription('Play music in ApocoCOLLE !'),
     async execute(interaction) {
+        player.stop();
         const customRow = new MessageActionRow()
             .addComponents(
                 new MessageButton()
                 .setCustomId('next')
                 .setLabel('Next')
-                .setStyle('PRIMARY'),
+                .setStyle('PRIMARY')
+                .setDisabled(true),
             );
         player.addListener('stateChange',
             async(oldState, newState) => {
@@ -41,9 +43,9 @@ module.exports = {
                         console.error(error);
                     }
                 }
-            }, )
+            }, )    
         const connection = await connectToVoiceChannel(interaction);
-        const filter = i => i.customId === 'next';
+        const filter = i => i.customId === 'next' && i.user.id === '337641064720760852';;
 
         const collector = interaction.channel.createMessageComponentCollector({ filter, time: 99999999 });
         var fs = require('fs');
