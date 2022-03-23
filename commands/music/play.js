@@ -11,6 +11,7 @@ const {
     VoiceConnectionStatus,
 } = require('@discordjs/voice');
 
+const player = createAudioPlayer();
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -23,8 +24,24 @@ module.exports = {
                 .setCustomId('next')
                 .setLabel('Next')
                 .setStyle('PRIMARY'),
-            )
-        const player = createAudioPlayer();
+            );
+        player.addListener('stateChange',
+            async(oldState, newState) => {
+                if (newState.status == AudioPlayerStatus.Idle) {
+                    try {
+                        // now files is an Array of the name of the files in the folder and you can pick a random name inside of that array 
+                        let bgmFile = files[Math.floor(Math.random() * files.length)];
+                        await interaction.editReply({
+                            content: "Playing " + bgmFile.slice(0, -4) + " in ApocoCOLLE !",
+                        });
+                        await playSong(player, bgmFile).then(() => {
+                            connection.subscribe(player);
+                        })
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+            }, )
         const connection = await connectToVoiceChannel(interaction);
         const filter = i => i.customId === 'next';
 
@@ -41,7 +58,7 @@ module.exports = {
                     });
                     await playSong(player, bgmFile).then(() => {
                         connection.subscribe(player);
-                    });
+                    })
                 } catch (error) {
                     console.error(error);
                 }
@@ -58,12 +75,14 @@ module.exports = {
             });
             await playSong(player, bgmFile).then(() => {
                 connection.subscribe(player);
-            });
+            })
         } catch (error) {
             console.error(error);
         }
     },
 };
+
+
 
 async function connectToVoiceChannel(interaction) {
     let channelId = '447325615587196933';
