@@ -12,10 +12,10 @@ module.exports = {
         .setDescription('Get equip information !!!')
         .addNumberOption(option =>
             option.setName('id')
-                .setDescription('id'))
+            .setDescription('id'))
         .addStringOption(option =>
             option.setName('name')
-                .setDescription('name')),
+            .setDescription('name')),
     async execute(interaction) {
         let idInput = interaction.options.getNumber('id');
         let nameInput = interaction.options.getString('name');
@@ -33,19 +33,19 @@ module.exports = {
                 const customRow = new MessageActionRow()
                     .addComponents(
                         new MessageButton()
-                            .setCustomId('info-' + item[0].id)
-                            .setLabel('Info')
-                            .setStyle('PRIMARY'),
+                        .setCustomId('info-' + item[0].id)
+                        .setLabel('Info')
+                        .setStyle('PRIMARY'),
                     ).addComponents(
                         new MessageButton()
-                            .setCustomId('XXX-' + item[0].id)
-                            .setLabel('XXX')
-                            .setStyle('PRIMARY'),
+                        .setCustomId('XXX-' + item[0].id)
+                        .setLabel('XXX')
+                        .setStyle('PRIMARY'),
                     ).addComponents(
                         new MessageButton()
-                            .setCustomId('moe-' + item[0].id)
-                            .setLabel('XXX')
-                            .setStyle('PRIMARY'),
+                        .setCustomId('moe-' + item[0].id)
+                        .setLabel('XXX')
+                        .setStyle('PRIMARY'),
                     );
                 const setIcon = new MessageAttachment('./assets/icons/' + item[0].seriesId + '.png');
                 const equipIcon = new MessageAttachment('./assets/equip_icons/' + getIdString(item[0].img) + '.png');
@@ -81,7 +81,7 @@ module.exports = {
 
                 const collector = interaction.channel.createMessageComponentCollector({
                     filter,
-                    time: 15000
+                    time: 9999999
                 });
                 await interaction.editReply({ content: replyMessage, components: [rowMenus] });
 
@@ -90,19 +90,19 @@ module.exports = {
                         const customRow = new MessageActionRow()
                             .addComponents(
                                 new MessageButton()
-                                    .setCustomId('info-' + i.values[0].id)
-                                    .setLabel('Info')
-                                    .setStyle('PRIMARY'),
+                                .setCustomId('info-' + i.values[0].id)
+                                .setLabel('Info')
+                                .setStyle('PRIMARY'),
                             ).addComponents(
                                 new MessageButton()
-                                    .setCustomId('XXX-' + i.values[0].id)
-                                    .setLabel('XXX')
-                                    .setStyle('PRIMARY'),
+                                .setCustomId('XXX-' + i.values[0].id)
+                                .setLabel('XXX')
+                                .setStyle('PRIMARY'),
                             ).addComponents(
                                 new MessageButton()
-                                    .setCustomId('moe-' + i.values[0].id)
-                                    .setLabel('XXX')
-                                    .setStyle('PRIMARY'),
+                                .setCustomId('moe-' + i.values[0].id)
+                                .setLabel('XXX')
+                                .setStyle('PRIMARY'),
                             );
                         const setIcon = new MessageAttachment('./assets/icons/' + item.find(item => item.id == i.values[0]).seriesId + '.png');
                         const equipIcon = new MessageAttachment('./assets/equip_icons/' + getIdString(item.find(item => item.id == i.values[0]).img) + '.png');
@@ -126,38 +126,38 @@ module.exports = {
     getEmbed(data, category, moe) {
         switch (category) {
             default:
-            case 'info':
+                case 'info':
                 const stringImg = getIdString(data.img);
-                let embed = new MessageEmbed()
-                    .setThumbnail('attachment://' + data.seriesId + '.png')
-                    .setColor('#0099ff')
-                    .setAuthor(data.title, 'attachment://' + data.seriesId + '.png')
-                    .setDescription(getTitle(data.rarity) + "\n" + getDescription(data.desc) + "\u200B")
+            let embed = new MessageEmbed()
+                .setThumbnail('attachment://' + data.seriesId + '.png')
+                .setColor('#0099ff')
+                .setAuthor(data.title, 'attachment://' + data.seriesId + '.png')
+                .setDescription(getTitle(data.rarity) + "\n" + getDescription(data.desc) + "\u200B")
 
-                    .setTimestamp()
-                embed.addField("Stats", blockQuote(italic(bold(getStats(data)))));
-                embed.setThumbnail('attachment://' + stringImg + '.png');
-                if (data.prop1) {
-                    embed.addField(getTitleDescription(data.prop1), getDescription(data.prop1.maxLvDesc), true)
-                }
-                if (data.prop2) {
-                    embed.addField(data.prop2.title + "-" + data.prop2.damageType, getDescription(data.prop2.maxLvDesc), true)
-                }
-                if (data.ultraSkill) {
-                    embed.addField(
-                        data.hiddenUltraSkill ? data.hiddenUltraSkill.title : data.ultraSkill.title,
-                        getDescription(data.hiddenUltraSkill ? data.hiddenUltraSkill.maxLvDesc : data.ultraSkill.maxLvDesc), true)
-                }
-                if (data.normalSkill1) {
-                    embed.addField(data.normalSkill1.title, getDescription(data.normalSkill1.maxLvDesc), true)
-                }
-                if (data.normalSkill2) {
-                    embed.addField(data.normalSkill2.title, getDescription(data.normalSkill2.maxLvDesc), true)
-                }
-                if (moe != "-1") {
-                    embed.setImage('attachment://' + data.posterId + '.png')
-                }
-                return embed;
+            .setTimestamp()
+            embed.addField("Stats", blockQuote(italic(bold(getStats(data)))));
+            embed.setThumbnail('attachment://' + stringImg + '.png');
+            if (data.prop1) {
+                embed.addField(getTitleDescription(data.prop1), getDescription(data.prop1.maxLvDesc), true)
+            }
+            if (data.prop2) {
+                embed.addField(data.prop2.title + "-" + data.prop2.damageType, getDescription(data.prop2.maxLvDesc), true)
+            }
+            if (data.ultraSkill) {
+                embed.addField(
+                    data.hiddenUltraSkill ? data.hiddenUltraSkill.title : data.ultraSkill.title,
+                    getDescription(data.hiddenUltraSkill ? data.hiddenUltraSkill.maxLvDesc : data.ultraSkill.maxLvDesc), true)
+            }
+            if (data.normalSkill1) {
+                embed.addField(data.normalSkill1.title, getDescription(data.normalSkill1.maxLvDesc), true)
+            }
+            if (data.normalSkill2) {
+                embed.addField(data.normalSkill2.title, getDescription(data.normalSkill2.maxLvDesc), true)
+            }
+            if (moe != "-1") {
+                embed.setImage('attachment://' + data.posterId + '.png')
+            }
+            return embed;
             // .setFooter('Info', 'attachment://main.png');
             // case 'skill':
             //         return new MessageEmbed()
@@ -347,7 +347,7 @@ function findData(id, name) {
     if (id != null) {
         if (ggz_data.find(item => item.id == id)) {
             if (ggz_data.find(item => item.id == id).ultraSkill) {
-                lstData.push({ ...ggz_data.find(item => item.id == id), seriesId: 22 })
+                lstData.push({...ggz_data.find(item => item.id == id), seriesId: 22 })
             } else {
                 lstData.push(ggz_data.find(item => item.id == id))
             }
@@ -357,14 +357,14 @@ function findData(id, name) {
     }
     if (name != null && id == null) {
         ggz_data.filter(
-            item => stringSimilarity.compareTwoStrings(name.replaceAll(" ", "").toLowerCase(), item.title.replaceAll(" ", "").toLowerCase()) >= 0.5
-                || item.title.replaceAll(" ", "").toLowerCase().includes(name.replaceAll(" ", "").toLowerCase())).forEach(item => {
-                    if (item.ultraSkill) {
-                        lstData.push({ ...item, seriesId: 22 });
-                    } else {
-                        lstData.push(item);
-                    }
-                });
+            item => stringSimilarity.compareTwoStrings(name.replaceAll(" ", "").toLowerCase(), item.title.replaceAll(" ", "").toLowerCase()) >= 0.5 ||
+            item.title.replaceAll(" ", "").toLowerCase().includes(name.replaceAll(" ", "").toLowerCase())).forEach(item => {
+            if (item.ultraSkill) {
+                lstData.push({...item, seriesId: 22 });
+            } else {
+                lstData.push(item);
+            }
+        });
         return lstData;
     }
 }

@@ -10,23 +10,23 @@ module.exports = {
         const customRow = new MessageActionRow()
             .addComponents(
                 new MessageButton()
-                    .setCustomId('F')
-                    .setLabel('Press F')
-                    .setStyle('DANGER'))
+                .setCustomId('F')
+                .setLabel('Press F')
+                .setStyle('DANGER'))
         let deadDate = new Date("10/11/2021");
         let currentDate = new Date();
         const filter = i => i.customId === 'F' && i.user.id === interaction.user.id;
 
-        const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
+        const collector = interaction.channel.createMessageComponentCollector({ filter, time: 9999999 });
 
         collector.on('collect', async i => {
             const disableRow = new MessageActionRow()
                 .addComponents(
                     new MessageButton()
-                        .setCustomId('FF')
-                        .setLabel('Press F')
-                        .setStyle('DANGER')
-                        .setDisabled(true));
+                    .setCustomId('FF')
+                    .setLabel('Press F')
+                    .setStyle('DANGER')
+                    .setDisabled(true));
             if (i.customId === 'F') {
                 await i.update({ content: "GGZ has dead for " + Math.floor(((currentDate.getTime() - deadDate.getTime()) / (1000 * 3600 * 24))) + " day", components: [disableRow] });
             }

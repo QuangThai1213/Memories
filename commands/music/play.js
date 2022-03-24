@@ -18,14 +18,12 @@ module.exports = {
         .setName('apococolle')
         .setDescription('Play music in ApocoCOLLE !'),
     async execute(interaction) {
-        player.stop();
         const customRow = new MessageActionRow()
             .addComponents(
                 new MessageButton()
                 .setCustomId('next')
                 .setLabel('Next')
                 .setStyle('PRIMARY')
-                .setDisabled(true),
             );
         player.addListener('stateChange',
             async(oldState, newState) => {
@@ -35,6 +33,7 @@ module.exports = {
                         let bgmFile = files[Math.floor(Math.random() * files.length)];
                         await interaction.editReply({
                             content: "Playing " + bgmFile.slice(0, -4) + " in ApocoCOLLE !",
+                            ephemeral: true
                         });
                         await playSong(player, bgmFile).then(() => {
                             connection.subscribe(player);
@@ -43,11 +42,11 @@ module.exports = {
                         console.error(error);
                     }
                 }
-            }, )    
+            }, )
         const connection = await connectToVoiceChannel(interaction);
         const filter = i => i.customId === 'next' && i.user.id === '337641064720760852';;
 
-        const collector = interaction.channel.createMessageComponentCollector({ filter, time: 99999999 });
+        const collector = interaction.channel.createMessageComponentCollector({ filter });
         var fs = require('fs');
         var files = fs.readdirSync('./bgm');
         collector.on('collect', async i => {
@@ -57,6 +56,7 @@ module.exports = {
                     let bgmFile = files[Math.floor(Math.random() * files.length)];
                     await i.update({
                         content: "Playing " + bgmFile.slice(0, -4) + " in ApocoCOLLE !",
+                        ephemeral: true
                     });
                     await playSong(player, bgmFile).then(() => {
                         connection.subscribe(player);
@@ -67,13 +67,13 @@ module.exports = {
             }
         });
 
-        collector.on('end', collected => console.log(`Collected ${collected.size} items`));
         try {
             // now files is an Array of the name of the files in the folder and you can pick a random name inside of that array 
             let bgmFile = files[Math.floor(Math.random() * files.length)];
             await interaction.reply({
                 content: "Playing " + bgmFile.slice(0, -4) + " in ApocoCOLLE !",
-                components: [customRow]
+                components: [customRow],
+                ephemeral: true
             });
             await playSong(player, bgmFile).then(() => {
                 connection.subscribe(player);
@@ -87,16 +87,18 @@ module.exports = {
 
 
 async function connectToVoiceChannel(interaction) {
-    let channelId = '447325615587196933';
-    if (interaction.member.guild.id == '261876843219648512') {
-        channelId = '265406686066376704';
-    }
+    let voiceChannel = interaction.member.voice.channel;
+
     const connection = joinVoiceChannel({
-        channelId: channelId,
+        channelId: voiceChannel.id,
         guildId: interaction.member.guild.id,
         adapterCreator: interaction.member.guild.voiceAdapterCreator,
         selfDeaf: false
     });
+    if (voiceChannel == null) {
+        connection.destroy();
+        throw 'Not in voice channel';
+    }
     try {
         await entersState(connection, VoiceConnectionStatus.Ready, 30e3);
         return connection;
@@ -107,7 +109,6 @@ async function connectToVoiceChannel(interaction) {
 }
 
 function playSong(player, bgm) {
-
     const resource = createAudioResource('./bgm/' + bgm, {
         inputType: StreamType.OggOpus,
     });
