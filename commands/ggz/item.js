@@ -6,23 +6,7 @@ const { bold, italic, strikethrough, underscore, spoiler, quote, blockQuote } = 
 var stringSimilarity = require("string-similarity");
 let rawdata = fs.readFileSync('./data/ggz_data.json');
 const ggz_data = JSON.parse(rawdata);
-const customRow = new MessageActionRow()
-    .addComponents(
-        new MessageButton()
-            .setCustomId('info-' + item[0].id)
-            .setLabel('Info')
-            .setStyle('PRIMARY'),
-    ).addComponents(
-        new MessageButton()
-            .setCustomId('XXX-' + item[0].id)
-            .setLabel('XXX')
-            .setStyle('PRIMARY'),
-    ).addComponents(
-        new MessageButton()
-            .setCustomId('moe-' + item[0].id)
-            .setLabel('XXX')
-            .setStyle('PRIMARY'),
-    );
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('item')
@@ -42,6 +26,23 @@ module.exports = {
             interaction.editReply("XXX");
         } else {
             const item = findData(idInput, nameInput);
+            const customRow = new MessageActionRow()
+                .addComponents(
+                    new MessageButton()
+                        .setCustomId('info-' + item[0].id)
+                        .setLabel('Info')
+                        .setStyle('PRIMARY'),
+                ).addComponents(
+                    new MessageButton()
+                        .setCustomId('XXX-' + item[0].id)
+                        .setLabel('XXX')
+                        .setStyle('PRIMARY'),
+                ).addComponents(
+                    new MessageButton()
+                        .setCustomId('moe-' + item[0].id)
+                        .setLabel('XXX')
+                        .setStyle('PRIMARY'),
+                );
             const lstItemName = []
             if (item.length === 0) {
                 interaction.editReply("Find Nothing !");
