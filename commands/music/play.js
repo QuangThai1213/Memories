@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageAttachment, MessageEmbed, MessageActionRow, MessageButton, MessageSelectMenu } = require('discord.js');
-const { bold } = require('@discordjs/builders');
+const { MessageActionRow, MessageButton } = require('discord.js');
 const {
     joinVoiceChannel,
     createAudioPlayer,
@@ -21,46 +20,46 @@ module.exports = {
         const customRow = new MessageActionRow()
             .addComponents(
                 new MessageButton()
-                .setCustomId('next')
-                .setLabel('Next')
-                .setStyle('PRIMARY')
+                    .setCustomId('next')
+                    .setLabel('Next')
+                    .setStyle('PRIMARY'),
             );
         player.addListener('stateChange',
-            async(oldState, newState) => {
+            async (oldState, newState) => {
                 if (newState.status == AudioPlayerStatus.Idle) {
                     try {
-                        // now files is an Array of the name of the files in the folder and you can pick a random name inside of that array 
-                        let bgmFile = files[Math.floor(Math.random() * files.length)];
+                        // now files is an Array of the name of the files in the folder and you can pick a random name inside of that array
+                        const bgmFile = files[Math.floor(Math.random() * files.length)];
                         await interaction.editReply({
-                            content: "Playing " + bgmFile.slice(0, -4) + " in ApocoCOLLE !",
-                            ephemeral: true
+                            content: 'Playing ' + bgmFile.slice(0, -4) + ' in ApocoCOLLE !',
+                            ephemeral: true,
                         });
                         await playSong(player, bgmFile).then(() => {
                             connection.subscribe(player);
-                        })
+                        });
                     } catch (error) {
                         console.error(error);
                     }
                 }
-            }, )
+            });
         const connection = await connectToVoiceChannel(interaction);
-        const filter = i => i.customId === 'next' && i.user.id === '337641064720760852';;
+        const filter = i => i.customId === 'next' && i.user.id === '337641064720760852';
 
         const collector = interaction.channel.createMessageComponentCollector({ filter });
-        var fs = require('fs');
-        var files = fs.readdirSync('./bgm');
+        const fs = require('fs');
+        const files = fs.readdirSync('./bgm');
         collector.on('collect', async i => {
             if (i.customId === 'next') {
                 try {
-                    // now files is an Array of the name of the files in the folder and you can pick a random name inside of that array 
-                    let bgmFile = files[Math.floor(Math.random() * files.length)];
+                    // now files is an Array of the name of the files in the folder and you can pick a random name inside of that array
+                    const bgmFile = files[Math.floor(Math.random() * files.length)];
                     await i.update({
-                        content: "Playing " + bgmFile.slice(0, -4) + " in ApocoCOLLE !",
-                        ephemeral: true
+                        content: 'Playing ' + bgmFile.slice(0, -4) + ' in ApocoCOLLE !',
+                        ephemeral: true,
                     });
                     await playSong(player, bgmFile).then(() => {
                         connection.subscribe(player);
-                    })
+                    });
                 } catch (error) {
                     console.error(error);
                 }
@@ -68,16 +67,16 @@ module.exports = {
         });
 
         try {
-            // now files is an Array of the name of the files in the folder and you can pick a random name inside of that array 
-            let bgmFile = files[Math.floor(Math.random() * files.length)];
+            // now files is an Array of the name of the files in the folder and you can pick a random name inside of that array
+            const bgmFile = files[Math.floor(Math.random() * files.length)];
             await interaction.reply({
-                content: "Playing " + bgmFile.slice(0, -4) + " in ApocoCOLLE !",
+                content: 'Playing ' + bgmFile.slice(0, -4) + ' in ApocoCOLLE !',
                 components: [customRow],
-                ephemeral: true
+                ephemeral: true,
             });
             await playSong(player, bgmFile).then(() => {
                 connection.subscribe(player);
-            })
+            });
         } catch (error) {
             console.error(error);
         }
@@ -85,15 +84,14 @@ module.exports = {
 };
 
 
-
 async function connectToVoiceChannel(interaction) {
-    let voiceChannel = interaction.member.voice.channel;
+    const voiceChannel = interaction.member.voice.channel;
 
     const connection = joinVoiceChannel({
         channelId: voiceChannel.id,
         guildId: interaction.member.guild.id,
         adapterCreator: interaction.member.guild.voiceAdapterCreator,
-        selfDeaf: false
+        selfDeaf: false,
     });
     if (voiceChannel == null) {
         connection.destroy();
@@ -108,6 +106,7 @@ async function connectToVoiceChannel(interaction) {
     }
 }
 
+// eslint-disable-next-line no-shadow
 function playSong(player, bgm) {
     const resource = createAudioResource('./bgm/' + bgm, {
         inputType: StreamType.OggOpus,

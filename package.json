@@ -32,5 +32,8 @@
         "sequelize": "^6.20.1",
         "sqlite3": "^5.0.8",
         "string-similarity": "^4.0.4"
+    },
+    "devDependencies": {
+        "eslint": "^8.39.0"
     }
 }
